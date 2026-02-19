@@ -69,53 +69,63 @@
         <button onclick="loadList()" class="btn">Kembali</button>
     </div>
     <script>
-        const apiURL = '../api/mahasiswa.php';
+const apiURL = '../api/mahasiswa.php';
 
-        function loadList() {
-            document.getElementById('detail').innerHTML = '';
-            document.getElementById('back').style.display = 'none';
-            
-            fetch(apiURL)
-                .then(res => res.json())
-                .then(data => {
-                    const tbody = document.querySelector('#list tbody');
-                    tbody.innerHTML = '';
-                    data.forEach(mhs => {
-                        const row = `
-                                    <tr>
-                                    <td>${mhs.nim}</td>
-                                    <td>${mhs.nama_mhs}</td>
-                                    <td><button class="btn" onclick="showDetail('${mhs.nim}')">Detil</button></td>
-                                    </tr>`;
-                                        tbody.innerHTML += row;
-                                    });
-                                });
-                        }
+function loadList() {
+    document.getElementById('detail').innerHTML = '';
+    document.getElementById('back').style.display = 'none';
+    document.getElementById('list').style.display = 'table';
 
-        function showDetail(nim) {
+    fetch(apiURL)
+        .then(res => res.json())
+        .then(data => {
+            const tbody = document.querySelector('#list tbody');
+            tbody.innerHTML = '';
 
-            fetch(`${apiURL}?nim=${nim}`)
-                .then(res => res.json())
-                .then(data => {
-                    let html = `
-                            <h2>Detil Mahasiswa</h2>
-                            <table style="margin:auto;">
-                            <tr><th>NIM</th><td>${data.nim}</td></tr>
-                            <tr><th>Nama</th><td>${data.nama_mhs}</td></tr>
-                            <tr><th>Jenis Kelamin</th><td>${data.jk === 'L' ? 'Laki-laki' :
-                            'Perempuan'}</td></tr>
-                            <tr><th>Tempat Lahir</th><td>${data.tempat_lahir}</td></tr>
-                            <tr><th>Tanggal Lahir</th><td>${data.tgl_lahir}</td></tr>
-                            </table>`;
-                    document.getElementById('detail').innerHTML = html;
-                    document.getElementById('back').style.display = 'block';
-                    document.querySelector('#list tbody').innerHTML = '';
-                    console.log(data);
-                });
-        }
-        // Load awal
-        loadList();
-    </script>
+            data.forEach(mhs => {
+                tbody.innerHTML += `
+                    <tr>
+                        <td>${mhs.nim}</td>
+                        <td>${mhs.nama_mhs}</td>
+                        <td>
+                            <button class="btn" 
+                                data-nim="${mhs.nim}" 
+                                onclick="showDetail(this)">
+                                Detil
+                            </button>
+                        </td>
+                    </tr>`;
+            });
+        });
+}
+
+function showDetail(btn) {
+    const nim = btn.getAttribute('data-nim');
+
+    fetch(`${apiURL}?nim=${nim}`)
+        .then(res => res.json())
+        .then(data => {
+            document.getElementById('detail').innerHTML = `
+                <h2>Detil Mahasiswa</h2>
+                <table style="margin:auto;">
+                    <tr><th>NIM</th><td>${data.nim}</td></tr>
+                    <tr><th>Nama</th><td>${data.nama_mhs}</td></tr>
+                    <tr><th>Jenis Kelamin</th>
+                        <td>${data.jk === 'L' ? 'Laki-laki' : 'Perempuan'}</td>
+                    </tr>
+                    <tr><th>Tempat Lahir</th><td>${data.tempat_lahir}</td></tr>
+                    <tr><th>Tanggal Lahir</th><td>${data.tgl_lahir}</td></tr>
+                </table>
+            `;
+
+            document.getElementById('list').style.display = 'none';
+            document.getElementById('back').style.display = 'block';
+        });
+}
+
+loadList();
+</script>
+
 </body>
 
 </html>

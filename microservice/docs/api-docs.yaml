@@ -1,0 +1,102 @@
+openapi: 3.0.3
+info:
+  title: Mahasiswa API
+  description: REST API untuk data mahasiswa sebagai bagian dari sistem kampus (microservice sederhana)
+  version: 1.0.0
+
+servers:
+  - url: http://localhost/kampus_microservice/api
+    description: Localhost Dev Server
+
+paths:
+  /mahasiswa.php:
+    get:
+      summary: Mendapatkan daftar seluruh mahasiswa
+      description: Mengambil NIM dan nama semua mahasiswa dari database.
+      responses:
+        '200':
+          description: Berhasil mengambil data
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/MahasiswaListItem'
+        '500':
+          description: Koneksi database gagal
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /mahasiswa.php/detail:
+    get:
+      summary: Mendapatkan detail mahasiswa berdasarkan NIM
+      description: Mengambil detail lengkap seorang mahasiswa berdasarkan NIM.
+      parameters:
+        - in: query
+          name: nim
+          required: true
+          description: NIM mahasiswa
+          schema:
+            type: string
+            example: "A001"
+      responses:
+        '200':
+          description: Berhasil mengambil data detail
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MahasiswaDetail'
+        '404':
+          description: Data mahasiswa tidak ditemukan
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          description: Koneksi database gagal
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+components:
+  schemas:
+    MahasiswaListItem:
+      type: object
+      properties:
+        nim:
+          type: string
+          example: "A001"
+        nama_mhs:
+          type: string
+          example: "Siti Nurhaliza"
+
+    MahasiswaDetail:
+      type: object
+      properties:
+        nim:
+          type: string
+          example: "A001"
+        nama_mhs:
+          type: string
+          example: "Siti Nurhaliza"
+        jk:
+          type: string
+          enum: [L, P]
+          example: "P"
+        tempat_lahir:
+          type: string
+          example: "Banjarmasin"
+        tgl_lahir:
+          type: string
+          format: date
+          example: "2002-05-18"
+
+    Error:
+      type: object
+      properties:
+        error:
+          type: string
+          example: "Data tidak ditemukan"
